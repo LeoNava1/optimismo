@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario</title>
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .options label {
+            margin: 10px 0;
+        }
+
+        button {
+            background-color: #0678e3;
+            text-align: center;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .question {
+            display: none;
+        }
+
+        /* Estilos para la barra de progreso */
+        .progress-container {
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .filler {
+            width: 0;
+            height: 100%;
+            background-color: #0678e3;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="filler"></div>
+            </div>
+        </div>
+
+        <h1>Ponte a prueba</h1>
+        <form id="quiz-form">
+
+            <div class="question">
+                <p>1. ¿Cuál es el enfoque principal del autor en cuanto al desarrollo personal?</p>
+                <div class="options">
+                    <label><input type="radio" name="q1" value="a"> Aprendizaje continuo</label>
+                    <label><input type="radio" name="q1" value="b"> Éxito material</label>
+                    <label><input type="radio" name="q1" value="c"> Desarrollo físico</label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <p>2. ¿Qué destaca Eduardo Punset sobre la gestión emocional en la soledad?</p>
+                <div class="options">
+                    <label><input type="radio" name="q2" value="a"> Ignorarla</label>
+                    <label><input type="radio" name="q2" value="b"> Evitarla a toda costa</label>
+                    <label><input type="radio" name="q2" value="c"> Aceptarla y comprenderla</label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <p>3. ¿Qué argumenta el autor sobre la importancia de las conexiones sociales?</p>
+                <div class="options">
+                    <label><input type="radio" name="q3" value="a"> Son irrelevantes</label>
+                    <label><input type="radio" name="q3" value="b"> Un obstáculo para el progreso</label>
+                    <label><input type="radio" name="q3" value="c"> Cruciales para el bienestar</label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <p>4. ¿Cuál es el papel de la conciencia según el autor?</p>
+                <div class="options">
+                    <label><input type="radio" name="q4" value="a"> No tiene utilidad</label>
+                    <label><input type="radio" name="q4" value="b"> Controlar el inconsciente</label>
+                    <label><input type="radio" name="q4" value="c"> Ser ignorada</label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <p>5. ¿Qué destaca Eduardo Punset sobre la globalización y la tecnología?</p>
+                <div class="options">
+                    <label><input type="radio" name="q5" value="a"> Son amenazas</label>
+                    <label><input type="radio" name="q5" value="b"> Son impulsores del progreso</label>
+                    <label><input type="radio" name="q5" value="c"> No tienen impacto</label>
+                </div>
+            </div>
+            
+            <div class="center">
+                <button id="next-button">Siguiente</button>
+                <button type="submit" id="submit-button" style="display: none;">Enviar Respuestas</button>
+            </div>    
+
+        </form>
+        
+        <!-- Resultado -->
+        <div id="result" style="display: none;">
+            <h2>Resultado</h2>
+            <p>Tu puntuación: <span id="score"></span>/10</p>
+            <div id="motivational-message" style="display: none;"></div>
+            <button id="retry">Volver a Intentar</button>
+        </div>
+    </div>
+
+    <script>
+    
+        const quizForm = document.getElementById('quiz-form');
+            const resultDiv = document.getElementById('result');
+            const scoreSpan = document.getElementById('score');
+            const retryButton = document.getElementById('retry');
+            const nextButton = document.getElementById('next-button');
+            const submitButton = document.getElementById('submit-button');
+            const questions = document.querySelectorAll('.question');
+            let currentQuestion = 0;
+    
+            const answers = ['a', 'c', 'c', 'b', 'b'];
+    
+            function showQuestion(index) {
+                questions[index].style.display = 'block';
+            }
+    
+            function hideQuestion(index) {
+                questions[index].style.display = 'none';
+            }
+    
+            function showNextQuestion() {
+                if (validateAnswer()) {
+                    hideQuestion(currentQuestion);
+                    currentQuestion++;
+                    if (currentQuestion < questions.length) {
+                        showQuestion(currentQuestion);
+                        if (currentQuestion === questions.length - 1) {
+                            nextButton.style.display = 'none';
+                            submitButton.style.display = 'inline-block';
+                        }
+                    }
+                }
+            }
+    
+            function validateAnswer() {
+                const selectedAnswer = document.querySelector(`input[name="q${currentQuestion + 1}"]:checked`);
+                return !!selectedAnswer;
+            }
+
+            function showMotivationalMessage(score) {
+                const motivationalMessageDiv = document.getElementById('motivational-message');
+                const motivationalMessage = getMotivationalMessage(score);
+                motivationalMessageDiv.textContent = motivationalMessage;
+                motivationalMessageDiv.style.display = 'block';
+            }
+
+            function getMotivationalMessage(score) {
+                // Aquí puedes personalizar el mensaje según la puntuación obtenida
+                if (score >= 8) {
+                    return "¡Felicidades! Eres un experto en este tema. ¡Sigue así!";
+                } else if (score >= 6) {
+                    return "¡Muy bien! Estás progresando rapidamente. ¡Continúa aprendiendo!";
+                } else {
+                    return "No te desanimes, cada paso cuenta. ¡Sigue practicando y mejorarás!";
+                }
+            }
+
+            quizForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (validateAnswer()) {
+                    const formData = new FormData(quizForm);
+                    let score = 0;
+                    for (let i = 1; i <= answers.length; i++) {
+                        const selectedAnswer = formData.get(`q${i}`);
+                        if (selectedAnswer === answers[i - 1]) {
+                            score = score + 2;
+                        }
+                    }
+                    scoreSpan.textContent = score;
+                    resultDiv.style.display = 'block';
+                    showMotivationalMessage(score); // Mostrar la frase motivadora
+                    quizForm.style.display = 'none';
+                }
+            });
+    
+            quizForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (validateAnswer()) {
+                    const formData = new FormData(quizForm);
+                    let score = 0;
+                    for (let i = 1; i <= answers.length; i++) {
+                        const selectedAnswer = formData.get(`q${i}`);
+                        if (selectedAnswer === answers[i - 1]) {
+                            score=score+2;
+                        }
+                    }
+                    scoreSpan.textContent = score;
+                    resultDiv.style.display = 'block';
+                    quizForm.style.display = 'none';
+                }
+            });
+    
+            retryButton.addEventListener('click', function () {
+                location.reload();
+            });
+    
+            nextButton.addEventListener('click', showNextQuestion);
+    
+            // Mostrar la primera pregunta al cargar la página
+            showQuestion(currentQuestion);
+    
+            // Función para actualizar la barra de progreso
+            function updateProgressBar() {
+                const progress = document.querySelector('.filler');
+                const questions = document.querySelectorAll('.question');
+                const answeredQuestions = document.querySelectorAll('input:checked').length;
+                const progressWidth = (answeredQuestions / questions.length) * 100 + '%';
+                progress.style.width = progressWidth;
+            }
+    
+            // Agrega un evento change a los elementos input para actualizar la barra de progreso cuando se responda una pregunta
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('change', updateProgressBar);
+            });
+    
+        </script>
+    
+</body>
+</html>

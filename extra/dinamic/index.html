@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sopa de letras</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script language="javascript" type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> 
+  <script type="text/javascript" src="wordfind.js"></script> 
+  <script type="text/javascript" src="wordfindgame.js"></script> 
+</head>
+<body>
+
+  <div id='juego'></div>
+  <div id='Palabras'></div>
+  <div><button id='solve' class="button-presentation">Me Rindo</button></div>
+
+  <script>
+
+    var words = ['Futuro','Crisis','Intuicion','Inconsciente','Salud','Globalizacion'];
+    var gamePuzzle = wordfindgame.create(words, '#juego', '#Palabras'); 
+          
+    var puzzle = wordfind.newPuzzle(words,{height: 18, width:18, fillBlanks: false});
+    wordfind.print(puzzle);
+          
+    $('#solve').click( function() {
+      wordfindgame.solve(gamePuzzle, words);
+      $(this).hide(); // Oculta el botón "Resolver" al hacer clic en él
+      $('<div><button class="button-presentation">Reintentar</button></div>').attr('id', 'retry').insertAfter($(this));
+    });
+
+    $(document).on('click', '#retry', function () {
+      location.reload();
+    });
+        
+  </script>
+    
+</body>
+</html>
